@@ -35,5 +35,8 @@ install -D -m 0644 resources/systemd/chef-client.service %{buildroot}/usr/lib/sy
 %systemd_post chef-client.service
 
 %changelog
+* Wed Jul 28 2016 Enrique Jimenez <ejimenez@redborder.com> 1.0.0-2
+- Added wrapper script
+
 * Wed Jul 28 2016 Enrique Jimenez <ejimenez@redborder.com> 1.0.0-1
 - first spec version
