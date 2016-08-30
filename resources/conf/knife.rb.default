@@ -1,0 +1,9 @@
+log_level                :info
+log_location             STDOUT
+node_name                "HOSTNAME"
+client_key               "/etc/chef/client.pem"
+validation_client_name   'redborder-validator'
+validation_key           '/etc/chef/redborder-validator.pem'
+ssl_verify_mode          :verify_none
+chef_server_url          'https://erchef.redborder.cluster/organizations/redborder'
+cookbook_path [ '/var/chef/cookbooks', '/var/chef/site-cookbooks' ]
