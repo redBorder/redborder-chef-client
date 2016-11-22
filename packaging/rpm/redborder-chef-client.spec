@@ -10,7 +10,7 @@ Source0: %{name}-%{version}.tar.gz
 
 BuildRequires: systemd
 
-Requires: bash rvm
+Requires: bash redborder-rubyrvm
 
 %description
 %{summary}
