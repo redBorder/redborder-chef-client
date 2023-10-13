@@ -27,6 +27,8 @@ install -D -m 0644 resources/conf/knife.rb.default %{buildroot}/etc/chef/knife.r
 mkdir -p %{buildroot}/usr/lib/redborder/bin
 install -D -m 0755 resources/bin/rb_chef-client_start.sh %{buildroot}/usr/lib/redborder/bin/rb_chef-client_start.sh
 install -D -m 0644 resources/systemd/chef-client.service %{buildroot}/usr/lib/systemd/system/chef-client.service
+mkdir -p %{buildroot}/etc/chef/ohai_plugins/
+install -D -m 0644 resources/ohai_plugins/redborder.rb %{buildroot}/etc/chef/ohai_plugins/redborder.rb
 
 %files
 %defattr(0644,root,root)
@@ -36,6 +38,7 @@ install -D -m 0644 resources/systemd/chef-client.service %{buildroot}/usr/lib/sy
 /usr/lib/redborder/bin/rb_chef-client_start.sh
 %defattr(0644,root,root)
 /usr/lib/systemd/system/chef-client.service
+/etc/chef/ohai_plugins/redborder.rb
 
 %post
 %systemd_post chef-client.service
