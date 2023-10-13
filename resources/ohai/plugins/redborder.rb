@@ -294,5 +294,4 @@ Ohai.plugin(:Redborder) do
     redborder[:domain] = domain
   end
 
-  redborder
 end
