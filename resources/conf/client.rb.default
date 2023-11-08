@@ -6,3 +6,4 @@ validation_client_name 	"redborder-validator"
 validation_key   	"/etc/chef/redborder-validator.pem"
 chef_server_url  	"https://erchef.redborder.cluster/organizations/redborder"
 ssl_verify_mode  	:verify_none
+ohai.plugin_path << '/etc/chef/ohai/plugins'
