@@ -14,14 +14,14 @@ Ohai.plugin(:Redborder) do
     end
 
     rpms.each_line do |line|
-      r = /redborder-([a-z]*)-(.*)\.(noarch)/
+      r = /redborder-(manager|repo|common|malware)-(.*)\.(noarch)/
       m = r.match(line.chomp)
       if m.nil?
-        r = /redborder-([a-zA-Z]*)-([a-z]*)-(.*)\.(noarch)/
+        r = /redborder-([a-zA-Z]*)-(.*)\.(noarch)/
         m = r.match(line.chomp)
         if !m.nil?
-          redborder[:rpms]["#{m[1]}-#{m[2]}"] = m[3]
-          if (m[1] == "IPS" && m[2] == "sensor")
+          redborder[:rpms]["#{m[1]}"] = m[2]
+          if (m[1] == "ips")
             redborder[:is_sensor] = true
             redborder[:snort] = Mash.new
             redborder[:snort][:version] = shell_out("snort --version 2>&1 | grep Version | sed 's/.*Version //' | sed 's/ .*' | awk '{printf(\"%s\", $1)}'").stdout.chomp
