@@ -6,39 +6,37 @@ Ohai.plugin(:Redborder) do
     redborder[:rpms] = Mash.new
     redborder[:is_sensor] = false
     redborder[:is_manager] = false
+    redborder[:is_proxy] = false
 
     rpms = shell_out('rpm -qa | grep redborder-').stdout
 
-    %w(manager proxy ips).each do |m_type|
-      redborder[("is_" + m_type).to_sym] = rpms.include?(m_type)
-    end
-
     rpms.each_line do |line|
-      r = /redborder-(manager|repo|common|malware)-(.*)\.(noarch)/
+      r = /redborder-(manager|repo|common|malware|proxy|ips)-(.*)\.(noarch)/
       m = r.match(line.chomp)
-      if m.nil?
-        r = /redborder-([a-zA-Z]*)-(.*)\.(noarch)/
+      next unless m
+
+      redborder[:rpms][m[1]] = m[2].gsub(".el9.rb", "")
+      redborder[:is_manager] = true  if m[1] == "manager"
+      redborder[:is_sensor] = true if m[1] == "ips"
+      redborder[:is_proxy] = true if m[1] == "proxy"
+    end
+    
+    if redborder[:is_sensor]
+      rpms = shell_out('rpm -qa | grep -E "(snort-|barnyard2-)"').stdout
+      rpms.each_line do |line|
+        r = /(snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
-        if !m.nil?
-          redborder[:rpms]["#{m[1]}"] = m[2]
-          if (m[1] == "ips")
-            redborder[:is_sensor] = true
-            redborder[:snort] = Mash.new
-            redborder[:snort][:version] = shell_out("snort --version 2>&1 | grep Version | sed 's/.*Version //' | sed 's/ .*' | awk '{printf(\"%s\", $1)}'").stdout.chomp
-            redborder[:barnyard2] = Mash.new
-            redborder[:barnyard2][:version] = shell_out("barnyard2 --version 2>&1 | grep -i Version | sed 's/.*Version //' | sed 's/ .*' | awk '{printf(\"%s\", $1)}'").stdout.chomp
-          end
-        end
-      else
-        if (m[1] == "manager" || m[1] == "repo" || m[1] == "common" || m[1] == "malware")
-          redborder[:rpms][m[1]] = m[2].gsub(".el7.rb", "")
-        end
-        if (m[1] == "manager")
-          redborder[:is_manager] = true
+        next unless m
+        if m[1] == "snort"
+          redborder[:snort] = Mash.new
+          redborder[:snort][:version] =  m[2].gsub(".el9", "")
+        elsif m[1] == "barnyard2"
+          redborder[:barnyard2] = Mash.new
+          redborder[:barnyard2][:version] =  m[2].gsub(".el9", "")
         end
       end
     end
-
+    
     redborder[:dmidecode] = Mash.new
     redborder[:dmidecode][:manufacturer] = shell_out('dmidecode -t 1 | grep "Manufacturer:" | sed "s/.*Manufacturer: //"').stdout.chomp
     redborder[:dmidecode][:product_name] = shell_out('dmidecode -t 1 | grep "Product Name:" | sed "s/.*Product Name: //"').stdout.chomp
