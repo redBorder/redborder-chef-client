@@ -103,6 +103,8 @@ Ohai.plugin(:Redborder) do
         ipmi_cmds = ["ipmitool sdr type Fan", "ipmitool sdr type Temperature"]
       end
 
+      ipmi_cmds = [] if shell_out('rpm -qa | grep -q ipmitool').stdout.chomp != 0
+
       ipmi_cmds.each do |cmd|
         if cmd == "ipmitool sdr"
           shell_out(cmd).stdout.each_line do |line|
