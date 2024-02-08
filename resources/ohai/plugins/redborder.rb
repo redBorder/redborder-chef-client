@@ -103,6 +103,8 @@ Ohai.plugin(:Redborder) do
         ipmi_cmds = ["ipmitool sdr type Fan", "ipmitool sdr type Temperature"]
       end
 
+      ipmi_cmds = [] if shell_out('rpm -qa | grep -q ipmitool').stdout.chomp != 0
+
       ipmi_cmds.each do |cmd|
         if cmd == "ipmitool sdr"
           shell_out(cmd).stdout.each_line do |line|
@@ -140,8 +142,11 @@ Ohai.plugin(:Redborder) do
       redborder[:uptime]["15minute"] = match[3]
     end
 
-    inst = shell_out('rpm -q basesystem --qf "%{installtime:date}\n"').stdout.chomp
-    redborder[:install_date] = inst
+    if redborder[:is_manager]
+      redborder[:install_date] = shell_out('[ -f /etc/redborder/cluster-installed.txt ] && cat /etc/redborder/cluster-installed.txt 2>/dev/null').stdout.chomp
+    else
+      redborder[:install_date] = shell_out('[ -f /etc/redborder/sensor-installed.txt ] && cat /etc/redborder/sensor-installed.txt 2>/dev/null').stdout.chomp
+    end
 
     redborder[:manager_host] = shell_out('cat /etc/chef/client.rb | grep chef_server_url | awk "{print $2}" | sed "s|^.*//||" | sed "s|".*$||" | awk "{printf(\"%s\", $1);}"').stdout.chomp
 
