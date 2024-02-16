@@ -291,7 +291,7 @@ Ohai.plugin(:Redborder) do
 
     domain = shell_out('/bin/hostname -d 2>/dev/null').stdout.chomp
     domain = shell_out('grep domain /etc/resolv.conf|awk "{print $2}"').stdout.chomp if domain == ""
-    domain = shell_out('grep search /etc/resolv.conf|awk "{print $4}"').stdout.chomp if domain == ""
+    domain = shell_out('grep search /etc/resolv.conf | awk \'{print $NF}\'').stdout.chomp if domain == ""
     domain = "redborder.cluster" if domain == ""
 
     redborder[:domain] = domain
