@@ -289,12 +289,14 @@ Ohai.plugin(:Redborder) do
       end
     end
 
-    domain = shell_out('/bin/hostname -d 2>/dev/null').stdout.chomp
-    domain = shell_out('grep domain /etc/resolv.conf|awk "{print $2}"').stdout.chomp if domain == ""
-    domain = shell_out('grep search /etc/resolv.conf|awk "{print $2}"').stdout.chomp if domain == ""
-    domain = "redborder.cluster" if domain == ""
-
-    redborder[:domain] = domain
+    domain=`/bin/hostname -d 2>/dev/null`.chomp
+    domain=`grep domain /etc/resolv.conf|awk '{print $2}'`.chomp if domain==""
+    domain=`grep search /etc/resolv.conf|awk '{print $4}'`.chomp if domain=="" and redborder[:is_manager]
+    domain=`grep search /etc/resolv.conf|awk '{print $2}'`.chomp if domain=="" and (redborder[:is_proxy] or redborder[:is_sensor])
+    domain="redborder.cluster" if domain==""
+    
+    redborder[:domain]=domain
+    
   end
 
 end
