@@ -228,7 +228,7 @@ Ohai.plugin(:Redborder) do
           end
 
           redborder[:segments][iface.to_sym][:interfaces][eth.to_sym] = thash
-          if shell_out('bpctl_util #{eth} is_bypass|grep -q "^The interface is a control interface"; echo $?').stdout.chomp == "0"
+          if shell_out("bpctl_util #{eth} is_bypass|grep -q \"^The interface is a control interface\"; echo $?").stdout.chomp == "0"
             iface_master = eth.to_s
           end
           counter += 1
@@ -240,9 +240,9 @@ Ohai.plugin(:Redborder) do
         if counter > 0
           bond_index = bond_index + 1
           if ((iface =~ /^bpbr[\d]+$/) && iface_master != "")
-            if shell_out('bpctl_util #{eth} is_bypass|grep -q "^The interface is a control interface"; echo $?').stdout.chomp == "0"
+            if shell_out("bpctl_util #{eth} is_bypass|grep -q \"^The interface is a control interface\"; echo $?").stdout.chomp == "0"
               redborder[:segments][iface.to_sym][:master] = iface_master
-              redborder[:segments][iface.to_sym][:bypass] = (shell_out('bpctl_util #{iface_master} get_bypass|grep -q non-Bypass; [ $? -eq 0 ] && echo disabled || echo enabled').stdout.chomp == "enabled")
+              redborder[:segments][iface.to_sym][:bypass] = (shell_out("bpctl_util #{iface_master} get_bypass|grep -q non-Bypass; [ $? -eq 0 ] && echo disabled || echo enabled").stdout.chomp == "enabled")
             end
           else
             redborder[:segments][iface.to_sym][:master] = "n/a"
@@ -250,7 +250,7 @@ Ohai.plugin(:Redborder) do
           end
         end
 
-        if shell_out('/usr/lib/redborder/bin/rb_bypass.sh -b #{iface} -g &>/dev/null; echo -n $?').stdout.chomp == "1"
+        if shell_out("/usr/lib/redborder/bin/rb_bypass.sh -b #{iface} -g &>/dev/null; echo -n $?").stdout.chomp == "1"
           redborder[:segments][iface.to_sym]["status"] = "bypass"
         else
           redborder[:segments][iface.to_sym]["status"] = "on"
@@ -266,7 +266,7 @@ Ohai.plugin(:Redborder) do
         dna_index = iface.match(/^dna([\d]+)$/)[1].to_i
         if dna_index % 2 == 0
           dna_bond_index = bond_index + dna_index / 2
-          bypass = shell_out('bpctl_util #{iface} is_bypass|egrep -q "The interface is a control interface|The interface is a slave interface"; [ $? -eq 0 ] && echo 1 || echo 0').stdout.chomp == "1"
+          bypass = shell_out("bpctl_util #{iface} is_bypass|egrep -q \"The interface is a control interface|The interface is a slave interface\"; [ $? -eq 0 ] && echo 1 || echo 0").stdout.chomp == "1"
           bond_iface = bypass ? "bpbr#{dna_bond_index}" : "br#{dna_bond_index}"
           redborder[:segments][bond_iface.to_sym] = Mash.new
           redborder[:segments][bond_iface.to_sym][:interfaces] = {}
@@ -280,7 +280,7 @@ Ohai.plugin(:Redborder) do
 
           if bypass
             redborder[:segments][bond_iface.to_sym][:master] = iface
-            redborder[:segments][bond_iface.to_sym][:bypass] = (shell_out('bpctl_util #{iface} get_bypass|grep -q non-Bypass; [ $? -eq 0 ] && echo disabled || echo enabled').stdout.chomp == "enabled")
+            redborder[:segments][bond_iface.to_sym][:bypass] = (shell_out("bpctl_util #{iface} get_bypass|grep -q non-Bypass; [ $? -eq 0 ] && echo disabled || echo enabled").stdout.chomp == "enabled")
           else
             redborder[:segments][bond_iface.to_sym][:master] = "n/a"
             redborder[:segments][bond_iface.to_sym][:bypass] = false
