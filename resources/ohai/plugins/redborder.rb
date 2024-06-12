@@ -86,6 +86,11 @@ Ohai.plugin(:Redborder) do
       end
       kafka_configured_id = "-1" if kafka_configured_id.nil? || kafka_configured_id.empty?
       redborder[:kafka]["configured_id"] = kafka_configured_id.to_i
+
+      if File.exist?('/etc/redborder/rb_init_conf.yml')
+        management_iface = File.read('/etc/redborder/rb_init_conf.yml').match(/management_interface: (\S+)/)[1]
+        redborder[:management_interface] = management_iface
+      end
     else
       redborder[:ipmi] = Mash.new
       redborder[:ipmi][:lan] = Mash.new
