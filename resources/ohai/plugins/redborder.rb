@@ -153,7 +153,7 @@ Ohai.plugin(:Redborder) do
       redborder[:install_date] = shell_out('[ -f /etc/redborder/sensor-installed.txt ] && cat /etc/redborder/sensor-installed.txt 2>/dev/null').stdout.chomp
     end
 
-    redborder[:manager_host] = shell_out('cat /etc/chef/client.rb | grep chef_server_url | awk "{print $2}" | sed "s|^.*//||" | sed "s|".*$||" | awk "{printf(\"%s\", $1);}"').stdout.chomp
+    redborder[:manager_host] = shell_out('cat /etc/chef/client.rb | grep chef_server_url | awk \'{print $2}\' | sed \'s|^.*//||\' | sed \'s|".*$||\' | awk \'{printf("%s", $1);}\'').stdout.chom
 
     redborder[:has_watchdog] = File.chardev?("/dev/watchdog")
 
