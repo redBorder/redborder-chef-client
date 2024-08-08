@@ -1,7 +1,7 @@
 Ohai.plugin(:Redborder) do
   provides 'redborder'
 
-  collect_data(:default) do
+  collect_data do
     redborder Mash.new
     redborder[:rpms] = Mash.new
     redborder[:is_sensor] = false
