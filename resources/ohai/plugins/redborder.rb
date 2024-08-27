@@ -20,7 +20,7 @@ Ohai.plugin(:Redborder) do
       redborder[:is_sensor] = true if m[1] == "ips"
       redborder[:is_proxy] = true if m[1] == "proxy"
     end
-    
+
     if redborder[:is_sensor]
       rpms = shell_out('rpm -qa | grep -E "(snort-|barnyard2-)"').stdout
       rpms.each_line do |line|
@@ -36,7 +36,7 @@ Ohai.plugin(:Redborder) do
         end
       end
     end
-    
+
     redborder[:dmidecode] = Mash.new
     redborder[:dmidecode][:manufacturer] = shell_out('dmidecode -t 1 | grep "Manufacturer:" | sed "s/.*Manufacturer: //"').stdout.chomp
     redborder[:dmidecode][:product_name] = shell_out('dmidecode -t 1 | grep "Product Name:" | sed "s/.*Product Name: //"').stdout.chomp
@@ -153,7 +153,7 @@ Ohai.plugin(:Redborder) do
       redborder[:install_date] = shell_out('[ -f /etc/redborder/sensor-installed.txt ] && cat /etc/redborder/sensor-installed.txt 2>/dev/null').stdout.chomp
     end
 
-    redborder[:manager_host] = shell_out('cat /etc/chef/client.rb | grep chef_server_url | awk \'{print $2}\' | sed \'s|^.*//||\' | sed \'s|".*$||\' | awk \'{printf("%s", $1);}\'').stdout.chom
+    redborder[:manager_host] = shell_out('cat /etc/chef/client.rb | grep chef_server_url | awk \'{print $2}\' | sed \'s|^.*//||\' | sed \'s|".*$||\' | awk \'{printf("%s", $1);}\'').stdout.chomp
 
     redborder[:has_watchdog] = File.chardev?("/dev/watchdog")
 
@@ -299,9 +299,9 @@ Ohai.plugin(:Redborder) do
     domain=`grep search /etc/resolv.conf|awk '{print $4}'`.chomp if domain=="" and redborder[:is_manager]
     domain=`grep search /etc/resolv.conf|awk '{print $2}'`.chomp if domain=="" and (redborder[:is_proxy] or redborder[:is_sensor])
     domain="redborder.cluster" if domain==""
-    
+
     redborder[:domain]=domain
-    
+
   end
 
 end
