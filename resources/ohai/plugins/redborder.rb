@@ -90,6 +90,9 @@ Ohai.plugin(:Redborder) do
       if File.exist?('/etc/redborder/rb_init_conf.yml')
         management_iface = File.read('/etc/redborder/rb_init_conf.yml').match(/management_interface: (\S+)/)[1]
         redborder[:management_interface] = management_iface
+
+        sync_interface = File.read('/etc/redborder/rb_init_conf.yml').match(/sync_interface: (\S+)/)[1]
+        redborder[:sync_interface] = sync_interface
       end
     else
       redborder[:ipmi] = Mash.new
