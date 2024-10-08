@@ -187,6 +187,10 @@ Ohai.plugin(:Redborder) do
       end
       # </get IPS model
 
+      conf ||= YAML.load_file('/etc/redborder/rb_init_conf.yml')
+      redborder[:manager_registration_ip] = conf['cloud_address'] if conf && conf['cloud_address']
+      redborder[:manager_registration_ip] = conf['webui_host'] if conf && conf['webui_host']
+
       netDir = Dir.open('/sys/class/net/')
       netDir.each do |iface|
         next if iface == "." || iface == ".."
