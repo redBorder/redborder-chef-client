@@ -48,6 +48,13 @@ Ohai.plugin(:Redborder) do
       redborder[:dmidecode][:version] = shell_out('dmidecode -t 1 | grep "Version:" | sed "s/.*Version: //"').stdout.chomp
     end
 
+    # set manager_registration_ip
+    if redborder[:is_sensor] || redborder[:is_proxy]
+      conf ||= YAML.load_file('/etc/redborder/rb_init_conf.yml')
+      redborder[:manager_registration_ip] = conf['cloud_address'] if conf && conf['cloud_address']
+      redborder[:manager_registration_ip] = conf['webui_host'] if redborder[:is_sensor] && conf && conf['webui_host']
+    end
+
     if redborder[:is_manager]
       redborder[:cluster] = Mash.new
       redborder[:cluster][:general] = Mash.new
@@ -186,10 +193,6 @@ Ohai.plugin(:Redborder) do
         end
       end
       # </get IPS model
-
-      conf ||= YAML.load_file('/etc/redborder/rb_init_conf.yml')
-      redborder[:manager_registration_ip] = conf['cloud_address'] if conf && conf['cloud_address']
-      redborder[:manager_registration_ip] = conf['webui_host'] if conf && conf['webui_host']
 
       netDir = Dir.open('/sys/class/net/')
       netDir.each do |iface|
