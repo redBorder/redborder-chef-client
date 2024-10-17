@@ -56,6 +56,8 @@ Ohai.plugin(:Redborder) do
     end
 
     if redborder[:is_manager]
+      redborder[:leader_configuring] = ::File.exist?('/var/lock/leader-configuring.lock')
+
       redborder[:cluster] = Mash.new
       redborder[:cluster][:general] = Mash.new
       redborder[:cluster][:services] = []
