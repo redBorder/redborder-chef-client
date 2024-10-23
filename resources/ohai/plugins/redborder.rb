@@ -53,6 +53,19 @@ Ohai.plugin(:Redborder) do
       end
     end
 
+    # get repo version
+    rpms = shell_out('rpm -qa | grep -E "(redborder-repo-)"').stdout
+    rpms.each_line do |line|
+      r = /(redborder-repo)-(.*)\.(noarch)/
+      m = r.match(line.chomp)
+      next unless m
+
+      if m[1] == "redborder-repo"
+        redborder[:repo] = Mash.new
+        redborder[:repo][:version] =  m[2].gsub(".el9", "")
+      end
+    end
+
     redborder[:dmidecode] = Mash.new
     redborder[:dmidecode][:manufacturer] = shell_out('dmidecode -t 1 | grep "Manufacturer:" | sed "s/.*Manufacturer: //"').stdout.chomp
     redborder[:dmidecode][:product_name] = shell_out('dmidecode -t 1 | grep "Product Name:" | sed "s/.*Product Name: //"').stdout.chomp
