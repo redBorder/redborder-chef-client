@@ -27,6 +27,7 @@ Ohai.plugin(:Redborder) do
         r = /(snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
         next unless m
+
         if m[1] == "snort"
           redborder[:snort] = Mash.new
           redborder[:snort][:version] =  m[2].gsub(".el9", "")
@@ -34,6 +35,34 @@ Ohai.plugin(:Redborder) do
           redborder[:barnyard2] = Mash.new
           redborder[:barnyard2][:version] =  m[2].gsub(".el9", "")
         end
+      end
+    end
+
+    # get webui version
+    if redborder[:is_manager]
+      rpms = shell_out('rpm -qa | grep -E "(redborder-webui-)"').stdout
+      rpms.each_line do |line|
+        r = /(redborder-webui)-(.*)\.(noarch)/
+        m = r.match(line.chomp)
+        next unless m
+
+        if m[1] == "redborder-webui"
+          redborder[:webui] = Mash.new
+          redborder[:webui][:version] =  m[2].gsub(".el9.rb", "")
+        end
+      end
+    end
+
+    # get repo version
+    rpms = shell_out('rpm -qa | grep -E "(redborder-repo-)"').stdout
+    rpms.each_line do |line|
+      r = /(redborder-repo)-(.*)\.(noarch)/
+      m = r.match(line.chomp)
+      next unless m
+
+      if m[1] == "redborder-repo"
+        redborder[:repo] = Mash.new
+        redborder[:repo][:version] =  m[2].gsub(".el9.rb", "")
       end
     end
 
