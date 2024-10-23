@@ -48,7 +48,7 @@ Ohai.plugin(:Redborder) do
 
         if m[1] == "redborder-webui"
           redborder[:webui] = Mash.new
-          redborder[:webui][:version] =  m[2].gsub(".el9", "")
+          redborder[:webui][:version] =  m[2].gsub(".el9.rb", "")
         end
       end
     end
@@ -62,7 +62,7 @@ Ohai.plugin(:Redborder) do
 
       if m[1] == "redborder-repo"
         redborder[:repo] = Mash.new
-        redborder[:repo][:version] =  m[2].gsub(".el9", "")
+        redborder[:repo][:version] =  m[2].gsub(".el9.rb", "")
       end
     end
 
