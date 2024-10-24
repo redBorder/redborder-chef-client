@@ -24,10 +24,10 @@ Ohai.plugin(:Redborder) do
     if redborder[:is_sensor]
       rpms = shell_out('rpm -qa | grep -E "(snort-|barnyard2-)"').stdout
       rpms.each_line do |line|
-        r = /(snort|barnyard2)-(.*)\.(x86_64)/
+        r = /(snort3|snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
         next unless m
-        if m[1] == "snort"
+        if m[1] == "snort" || m[1] == "snort3"
           redborder[:snort] = Mash.new
           redborder[:snort][:version] =  m[2].gsub(".el9", "")
         elsif m[1] == "barnyard2"
