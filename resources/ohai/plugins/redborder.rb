@@ -27,6 +27,7 @@ Ohai.plugin(:Redborder) do
         r = /(snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
         next unless m
+
         if m[1] == "snort"
           redborder[:snort] = Mash.new
           redborder[:snort][:version] =  m[2].gsub(".el9", "")
@@ -34,6 +35,34 @@ Ohai.plugin(:Redborder) do
           redborder[:barnyard2] = Mash.new
           redborder[:barnyard2][:version] =  m[2].gsub(".el9", "")
         end
+      end
+    end
+
+    # get webui version
+    if redborder[:is_manager]
+      rpms = shell_out('rpm -qa | grep -E "(redborder-webui-)"').stdout
+      rpms.each_line do |line|
+        r = /(redborder-webui)-(.*)\.(noarch)/
+        m = r.match(line.chomp)
+        next unless m
+
+        if m[1] == "redborder-webui"
+          redborder[:webui] = Mash.new
+          redborder[:webui][:version] =  m[2].gsub(".el9.rb", "")
+        end
+      end
+    end
+
+    # get repo version
+    rpms = shell_out('rpm -qa | grep -E "(redborder-repo-)"').stdout
+    rpms.each_line do |line|
+      r = /(redborder-repo)-(.*)\.(noarch)/
+      m = r.match(line.chomp)
+      next unless m
+
+      if m[1] == "redborder-repo"
+        redborder[:repo] = Mash.new
+        redborder[:repo][:version] =  m[2].gsub(".el9.rb", "")
       end
     end
 
@@ -48,7 +77,16 @@ Ohai.plugin(:Redborder) do
       redborder[:dmidecode][:version] = shell_out('dmidecode -t 1 | grep "Version:" | sed "s/.*Version: //"').stdout.chomp
     end
 
+    # set manager_registration_ip
+    if redborder[:is_sensor] || redborder[:is_proxy]
+      conf ||= YAML.load_file('/etc/redborder/rb_init_conf.yml')
+      redborder[:manager_registration_ip] = conf['cloud_address'] if conf && conf['cloud_address']
+      redborder[:manager_registration_ip] = conf['webui_host'] if redborder[:is_sensor] && conf && conf['webui_host']
+    end
+
     if redborder[:is_manager]
+      redborder[:leader_configuring] = ::File.exist?('/var/lock/leader-configuring.lock')
+
       redborder[:cluster] = Mash.new
       redborder[:cluster][:general] = Mash.new
       redborder[:cluster][:services] = []
