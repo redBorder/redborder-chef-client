@@ -22,7 +22,7 @@ Ohai.plugin(:Redborder) do
     end
 
     if redborder[:is_sensor]
-      rpms = shell_out('rpm -qa | grep -E "(snort-|barnyard2-)"').stdout
+      rpms = shell_out('rpm -qa | grep -E "(snort3-|snort-|barnyard2-)"').stdout
       rpms.each_line do |line|
         r = /(snort3|snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
