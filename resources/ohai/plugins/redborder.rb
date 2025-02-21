@@ -96,7 +96,7 @@ Ohai.plugin(:Redborder) do
                   "druid-realtime", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker", "opscode-erchef",
                   "postgresql", "redborder-postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp",
                   "opscode-bookshelf", "opscode-chef-mover", "opscode-rabbitmq", "http2k", "redborder-cep", "snmpd", "snmptrapd",
-                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "redborder-ai"]
+                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "redborder-llm"]
       services.each do |s|
         service_data = Mash.new
         service_data[:name] = s
