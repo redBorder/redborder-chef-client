@@ -11,24 +11,23 @@ Ohai.plugin(:Redborder) do
     rpms = shell_out('rpm -qa | grep redborder-').stdout
 
     rpms.each_line do |line|
-      r = /redborder-(manager|repo|common|malware|proxy|ips)-(.*)\.(noarch)/
+      r = /redborder-(manager|repo|common|malware|proxy|ips|intrusion)-(.*)\.(noarch)/
       m = r.match(line.chomp)
       next unless m
 
       redborder[:rpms][m[1]] = m[2].gsub(".el9.rb", "")
       redborder[:is_manager] = true  if m[1] == "manager"
-      redborder[:is_sensor] = true if m[1] == "ips"
+      redborder[:is_sensor] = true if m[1] == "ips" or m[1] == "intrusion"
       redborder[:is_proxy] = true if m[1] == "proxy"
     end
 
     if redborder[:is_sensor]
-      rpms = shell_out('rpm -qa | grep -E "(snort-|barnyard2-)"').stdout
+      rpms = shell_out('rpm -qa | grep -E "(snort3-|snort-|barnyard2-)"').stdout
       rpms.each_line do |line|
-        r = /(snort|barnyard2)-(.*)\.(x86_64)/
+        r = /(snort3|snort|barnyard2)-(.*)\.(x86_64)/
         m = r.match(line.chomp)
         next unless m
-
-        if m[1] == "snort"
+        if m[1] == "snort" || m[1] == "snort3"
           redborder[:snort] = Mash.new
           redborder[:snort][:version] =  m[2].gsub(".el9", "")
         elsif m[1] == "barnyard2"
