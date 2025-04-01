@@ -101,15 +101,20 @@ Ohai.plugin(:Redborder) do
         service_data = Mash.new
         service_data[:name] = s
 
-        is_service_running = shell_out("systemctl is-active #{s}").stdout.chomp == "active"
-        is_service_enabled = shell_out("systemctl is-enabled #{s}").stdout.chomp == "enabled"
+        begin
+          result = shell_out("systemctl is-active #{s}")
+          service_data[:status] = result.stdout.chomp == "active"
+        rescue => e
+          service_data[:status] = false # default value
+          service_data[:error] = "Error in systemctl: #{e.message}"
+        end
 
-        if is_service_running
-          service_data[:status] = is_service_running
-          service_data[:ok] = is_service_enabled
-        else
-          service_data[:status] = is_service_running
-          service_data[:ok] = !is_service_enabled
+        begin
+          result = shell_out("systemctl is-enabled #{s}")
+          service_data[:ok] = result.stdout.chomp == "enabled"
+        rescue => e
+          service_data[:ok] = false # default value
+          service_data[:error] = "Error in systemctl: #{e.message}"
         end
 
         redborder[:cluster][:services] << service_data
