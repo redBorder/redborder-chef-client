@@ -94,7 +94,7 @@ Ohai.plugin(:Redborder) do
 
       services = ["chef-client", "consul", "zookeeper", "kafka", "webui", "rb-workers", "redborder-monitor", "druid-coordinator",
                   "druid-router","druid-indexer", "rb-druid-indexer", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker", "opscode-erchef",
-                  "postgresql", "redborder-postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp",
+                  "postgresql", "redborder-postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
                   "opscode-bookshelf", "opscode-chef-mover", "opscode-rabbitmq", "http2k", "redborder-cep", "snmpd", "snmptrapd",
                   "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "redborder-llm"]
       services.each do |s|
