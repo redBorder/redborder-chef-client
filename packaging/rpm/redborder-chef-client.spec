@@ -44,6 +44,9 @@ install -D -m 0644 resources/ohai/plugins/redborder.rb %{buildroot}/etc/chef/oha
 %systemd_post chef-client.service
 
 %changelog
+* Mon Jul 21 2025 Rafa Gomez <rgomez@redborder.com> 2.1.0
+- We stop using custom redborder-postgresql
+
 * Thu Aug 30 2016 Carlos J. Mateos <cjmateos@redborder.com> 1.0.0-4
 - Add chef client config files
 
