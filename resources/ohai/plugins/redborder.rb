@@ -93,8 +93,7 @@ Ohai.plugin(:Redborder) do
       redborder[:cluster][:general][:timestamp] = Time.now.to_i
 
       services = ["chef-client", "consul", "zookeeper", "kafka", "webui", "rb-workers", "redborder-monitor", "druid-coordinator",
-                  "druid-router","druid-indexer", "rb-druid-indexer", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker", "opscode-erchef",
-                  "postgresql", "redborder-postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
+                  "druid-router","druid-indexer", "rb-druid-indexer", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker", "opscode-erchef", "postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
                   "opscode-bookshelf", "opscode-chef-mover", "opscode-rabbitmq", "http2k", "redborder-cep", "snmpd", "snmptrapd",
                   "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "redborder-llm"]
       services.each do |s|
@@ -127,6 +126,9 @@ Ohai.plugin(:Redborder) do
       if File.exist?('/etc/redborder/rb_init_conf.yml')
         management_iface = File.read('/etc/redborder/rb_init_conf.yml').match(/management_interface: (\S+)/)[1]
         redborder[:management_interface] = management_iface
+
+        sync_interface = File.read('/etc/redborder/rb_init_conf.yml').match(/sync_interface: (\S+)/)[1]
+        redborder[:sync_interface] = sync_interface
       end
     else
       redborder[:ipmi] = Mash.new
