@@ -99,7 +99,7 @@ Ohai.plugin(:Redborder) do
                   "airflow-dag-processor", "airflow-scheduler", "airflow-triggerer", "airflow-webserver",
                   "opscode-erchef", "postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
                   "opscode-bookshelf", "opscode-chef-mover", "opscode-rabbitmq", "http2k", "redborder-cep", "snmpd", "snmptrapd",
-                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "aerospike"]
+                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "aerospike", "redborder-agents"]
       services.each do |s|
         service_data = Mash.new
         service_data[:name] = s
