@@ -1,3 +1,5 @@
+require 'time'
+
 Ohai.plugin(:Redborder) do
   provides 'redborder'
 
@@ -102,15 +104,30 @@ Ohai.plugin(:Redborder) do
         service_data = Mash.new
         service_data[:name] = s
 
-        is_service_running = shell_out("systemctl is-active #{s}").stdout.chomp == "active"
-        is_service_enabled = shell_out("systemctl is-enabled #{s}").stdout.chomp == "enabled"
+        show_output = shell_out("systemctl show #{s} --property=ActiveState,UnitFileState,ActiveEnterTimestamp,MemoryCurrent").stdout
+        props = {}
+        show_output.each_line do |line|
+          key, value = line.chomp.split("=", 2)
+          props[key] = value if key && value
+        end
+
+        is_service_running = props["ActiveState"] == "active"
+        is_service_enabled = props["UnitFileState"] == "enabled"
+
+        service_data[:status] = is_service_running
+        service_data[:ok] = is_service_running ? is_service_enabled : !is_service_enabled
 
         if is_service_running
-          service_data[:status] = is_service_running
-          service_data[:ok] = is_service_enabled
-        else
-          service_data[:status] = is_service_running
-          service_data[:ok] = !is_service_enabled
+          timestamp_str = props["ActiveEnterTimestamp"]
+          if timestamp_str && !timestamp_str.empty? && timestamp_str != "n/a"
+            begin
+              service_data[:runtime] = (Time.now - Time.parse(timestamp_str)).to_i
+            rescue ArgumentError
+            end
+          end
+
+          memory_str = props["MemoryCurrent"]
+          service_data[:memory] = memory_str.to_i if memory_str =~ /^\d+$/
         end
 
         redborder[:cluster][:services] << service_data
