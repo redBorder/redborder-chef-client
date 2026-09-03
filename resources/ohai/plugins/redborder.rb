@@ -1,3 +1,5 @@
+require 'time'
+
 Ohai.plugin(:Redborder) do
   provides 'redborder'
 
@@ -93,22 +95,39 @@ Ohai.plugin(:Redborder) do
       redborder[:cluster][:general][:timestamp] = Time.now.to_i
 
       services = ["chef-client", "consul", "zookeeper", "kafka", "webui", "rb-workers", "redborder-monitor", "druid-coordinator",
-                  "druid-router","druid-indexer", "rb-druid-indexer", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker", "opscode-erchef", "postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
+                  "druid-router","druid-indexer", "rb-druid-indexer", "druid-middlemanager", "druid-overlord", "druid-historical", "druid-broker",
+                  "airflow-dag-processor", "airflow-scheduler", "airflow-triggerer", "airflow-webserver",
+                  "opscode-erchef", "postgresql", "nginx", "memcached", "n2klocd", "redborder-nmsp", "redis",
                   "opscode-bookshelf", "opscode-chef-mover", "opscode-rabbitmq", "http2k", "redborder-cep", "snmpd", "snmptrapd",
-                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "aerospike"]
+                  "redborder-dswatcher", "redborder-events-counter", "sfacctd", "redborder-ale", "logstash", "mongod", "minio", "aerospike", "redborder-agents"]
       services.each do |s|
         service_data = Mash.new
         service_data[:name] = s
 
-        is_service_running = shell_out("systemctl is-active #{s}").stdout.chomp == "active"
-        is_service_enabled = shell_out("systemctl is-enabled #{s}").stdout.chomp == "enabled"
+        show_output = shell_out("systemctl show #{s} --property=ActiveState,UnitFileState,ActiveEnterTimestamp,MemoryCurrent").stdout
+        props = {}
+        show_output.each_line do |line|
+          key, value = line.chomp.split("=", 2)
+          props[key] = value if key && value
+        end
+
+        is_service_running = props["ActiveState"] == "active"
+        is_service_enabled = props["UnitFileState"] == "enabled"
+
+        service_data[:status] = is_service_running
+        service_data[:ok] = is_service_running ? is_service_enabled : !is_service_enabled
 
         if is_service_running
-          service_data[:status] = is_service_running
-          service_data[:ok] = is_service_enabled
-        else
-          service_data[:status] = is_service_running
-          service_data[:ok] = !is_service_enabled
+          timestamp_str = props["ActiveEnterTimestamp"]
+          if timestamp_str && !timestamp_str.empty? && timestamp_str != "n/a"
+            begin
+              service_data[:runtime] = (Time.now - Time.parse(timestamp_str)).to_i
+            rescue ArgumentError
+            end
+          end
+
+          memory_str = props["MemoryCurrent"]
+          service_data[:memory] = memory_str.to_i if memory_str =~ /^\d+$/
         end
 
         redborder[:cluster][:services] << service_data
