@@ -114,15 +114,14 @@ Ohai.plugin(:Redborder) do
         redborder[:cluster][:services] << service_data
       end
 
-      # ftp/tftp are reported under their logical name (matching
-      # node['redborder']['services']['ftp'/'tftp'] and redborder-webui's
-      # Manager::DISPLAYABLE_SERVICES) rather than their real systemd unit,
-      # since that's what the cluster-status UI/toggle key off -- so they
-      # need the same systemdservices translation cookbook-rb-manager
+      # ftp is reported under its logical name (matching
+      # node['redborder']['services']['ftp'] and redborder-webui's
+      # Manager::DISPLAYABLE_SERVICES) rather than its real systemd unit,
+      # since that's what the cluster-status UI/toggle key off -- so it
+      # needs the same systemdservices translation cookbook-rb-manager
       # already uses instead of a literal name in the services array above.
       service_unit_overrides = {
-        "ftp" => "vsftpd",
-        "tftp" => "tftp.socket"
+        "ftp" => "vsftpd"
       }
       service_unit_overrides.each do |logical_name, unit_name|
         service_data = Mash.new
