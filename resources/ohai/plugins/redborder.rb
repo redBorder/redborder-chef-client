@@ -133,6 +133,33 @@ Ohai.plugin(:Redborder) do
         redborder[:cluster][:services] << service_data
       end
 
+      # ftp is reported under its logical name (matching
+      # node['redborder']['services']['ftp'] and redborder-webui's
+      # Manager::DISPLAYABLE_SERVICES) rather than its real systemd unit,
+      # since that's what the cluster-status UI/toggle key off -- so it
+      # needs the same systemdservices translation cookbook-rb-manager
+      # already uses instead of a literal name in the services array above.
+      service_unit_overrides = {
+        "ftp" => "vsftpd"
+      }
+      service_unit_overrides.each do |logical_name, unit_name|
+        service_data = Mash.new
+        service_data[:name] = logical_name
+
+        is_service_running = shell_out("systemctl is-active #{unit_name}").stdout.chomp == "active"
+        is_service_enabled = shell_out("systemctl is-enabled #{unit_name}").stdout.chomp == "enabled"
+
+        if is_service_running
+          service_data[:status] = is_service_running
+          service_data[:ok] = is_service_enabled
+        else
+          service_data[:status] = is_service_running
+          service_data[:ok] = !is_service_enabled
+        end
+
+        redborder[:cluster][:services] << service_data
+      end
+
       redborder[:kafka] = Mash.new
       if File.exist?("/tmp/kafka/meta.properties")
         kafka_configured_id = shell_out('grep "^broker.id=" /tmp/kafka/meta.properties | tr "=" " " | awk "{print $2}"').stdout.chomp
